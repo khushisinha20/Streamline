@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "302533791208",
+    "project_id": "streamline-f2a12",
+    "storage_bucket": "streamline-f2a12.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:302533791208:android:c5d3c5fb0c6d7c0826e85d",
+        "android_client_info": {
+          "package_name": "com.example.streamline"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "302533791208-154m0dubr0ae2gdgbgm5g9a2vr4jubab.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkOpQWJGN6yhvPP4b0h4wYLi6ZRnI9hzY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "302533791208-154m0dubr0ae2gdgbgm5g9a2vr4jubab.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "302533791208-1l3aov3ho095q4aad3l246dm7tep57op.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.streamline"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
