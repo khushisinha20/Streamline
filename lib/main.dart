@@ -1,12 +1,16 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:streamline/providers/user_provider.dart';
+import 'package:streamline/resources/auth_methods.dart';
 import 'package:streamline/screens/home_screen.dart';
 import 'package:streamline/screens/login_screen.dart';
 import 'package:streamline/screens/onboarding_screen.dart';
 import 'package:streamline/screens/signup_screen.dart';
 import 'package:streamline/utils/colors.dart';
 import 'package:provider/provider.dart';
+import 'package:streamline/models/user.dart' as model;
+import 'package:streamline/widgets/loading_indicator.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,7 +49,30 @@ class MyApp extends StatelessWidget {
         SignupScreen.routeName: (context) => const SignupScreen(),
         HomeScreen.routeName: (context) => const HomeScreen(),
       },
-      home: const OnboardingScreen(),
+      home: FutureBuilder(
+        future: AuthMethods()
+            .getCurrentUser(FirebaseAuth.instance.currentUser != null
+                ? FirebaseAuth.instance.currentUser!.uid
+                : null)
+            .then((value) {
+          if (value != null) {
+            Provider.of<UserProvider>(context, listen: false).setUser(
+              model.User.fromMap(value),
+            );
+          }
+        }),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const LoadingIndicator();
+          }
+
+          if (snapshot.hasData) {
+            return const HomeScreen();
+          }
+
+          return const OnboardingScreen();
+        },
+      ),
     );
   }
 }
