@@ -4,7 +4,8 @@ import 'package:streamline/screens/onboarding_screen.dart';
 import 'package:streamline/screens/signup_screen.dart';
 import 'package:streamline/utils/colors.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
