@@ -1,12 +1,21 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:streamline/providers/user_provider.dart';
+import 'package:streamline/screens/home_screen.dart';
 import 'package:streamline/screens/login_screen.dart';
 import 'package:streamline/screens/onboarding_screen.dart';
 import 'package:streamline/screens/signup_screen.dart';
 import 'package:streamline/utils/colors.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  await Firebase.initializeApp();
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(
+      create: (_) => UserProvider(),
+    ),
+  ], child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -34,6 +43,7 @@ class MyApp extends StatelessWidget {
         OnboardingScreen.routeName: (context) => const OnboardingScreen(),
         LoginScreen.routeName: (context) => const LoginScreen(),
         SignupScreen.routeName: (context) => const SignupScreen(),
+        HomeScreen.routeName: (context) => const HomeScreen(),
       },
       home: const OnboardingScreen(),
     );
