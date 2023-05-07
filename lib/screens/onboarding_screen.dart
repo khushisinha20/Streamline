@@ -1,6 +1,8 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:streamline/screens/login_screen.dart';
+import 'package:streamline/screens/signup_screen.dart';
 import 'package:streamline/widgets/custom_button.dart';
 
 class OnboardingScreen extends StatelessWidget {
@@ -28,9 +30,17 @@ class OnboardingScreen extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 15.0),
-              child: CustomButton(onTap: () {}, text: 'Log In'),
+              child: CustomButton(
+                  onTap: () {
+                    Navigator.pushNamed(context, LoginScreen.routeName);
+                  },
+                  text: 'Log In'),
             ),
-            CustomButton(onTap: () {}, text: 'Sign Up')
+            CustomButton(
+                onTap: () {
+                  Navigator.pushNamed(context, SignupScreen.routeName);
+                },
+                text: 'Sign Up')
           ],
         ),
       ),

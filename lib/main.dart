@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:streamline/screens/login_screen.dart';
 import 'package:streamline/screens/onboarding_screen.dart';
+import 'package:streamline/screens/signup_screen.dart';
 import 'package:streamline/utils/colors.dart';
 
 void main() {
@@ -29,6 +31,8 @@ class MyApp extends StatelessWidget {
           )),
       routes: {
         OnboardingScreen.routeName: (context) => const OnboardingScreen(),
+        LoginScreen.routeName: (context) => const LoginScreen(),
+        SignupScreen.routeName: (context) => const SignupScreen(),
       },
       home: const OnboardingScreen(),
     );
