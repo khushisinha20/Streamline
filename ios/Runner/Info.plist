@@ -49,5 +49,9 @@
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Photo for thumbnail</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Cam use</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Mic use</string>
 </dict>
 </plist>
