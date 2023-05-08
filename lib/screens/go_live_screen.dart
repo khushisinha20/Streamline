@@ -30,8 +30,11 @@ class _GoLiveScreenState extends State<GoLiveScreen> {
 
     if (channelId.isNotEmpty) {
       showSnackBar(context, 'Live Steam has started successfully!');
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => BroadcastScreen()));
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => BroadcastScreen(
+                isBroadcaster: true,
+                channelId: channelId,
+              )));
     }
   }
 
