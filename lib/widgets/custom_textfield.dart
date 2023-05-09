@@ -13,6 +13,7 @@ class CustomTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      onSubmitted: onTap,
       controller: controller,
       decoration: const InputDecoration(
         focusedBorder: OutlineInputBorder(
