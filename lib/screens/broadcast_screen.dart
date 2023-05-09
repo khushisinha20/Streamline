@@ -7,6 +7,8 @@ import 'package:streamline/config/appId.dart';
 import 'package:streamline/providers/user_provider.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
+import 'package:streamline/resources/firestore_methods.dart';
+import 'package:streamline/screens/home_screen.dart';
 
 class BroadcastScreen extends StatefulWidget {
   final bool isBroadcaster;
@@ -82,15 +84,32 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
         Provider.of<UserProvider>(context, listen: false).user.uid);
   }
 
+  _leaveChannel() async {
+    await _engine.leaveChannel();
+    if ('${Provider.of<UserProvider>(context, listen: false).user.uid}${Provider.of<UserProvider>(context, listen: false).user.username}' ==
+        widget.channelId) {
+      await FirestoreMethods().endLiveStream(widget.channelId);
+    } else {
+      await FirestoreMethods().updateViewCount(widget.channelId, false);
+    }
+    Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+  }
+
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context).user;
-    return Scaffold(
-      body: Padding(
-        padding: EdgeInsets.all(8),
-        child: Column(
-          children: [
-            _renderVideo(user),
-          ],
+    return WillPopScope(
+      onWillPop: () async {
+        await _leaveChannel();
+        return Future.value(true);
+      },
+      child: Scaffold(
+        body: Padding(
+          padding: EdgeInsets.all(8),
+          child: Column(
+            children: [
+              _renderVideo(user),
+            ],
+          ),
         ),
       ),
     );
