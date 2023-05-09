@@ -5,6 +5,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:streamline/config/appId.dart';
 import 'package:streamline/providers/user_provider.dart';
+import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
+import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
 
 class BroadcastScreen extends StatefulWidget {
   final bool isBroadcaster;
@@ -81,6 +83,37 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
   }
 
   Widget build(BuildContext context) {
-    return Scaffold();
+    final user = Provider.of<UserProvider>(context).user;
+    return Scaffold(
+      body: Padding(
+        padding: EdgeInsets.all(8),
+        child: Column(
+          children: [
+            _renderVideo(user),
+          ],
+        ),
+      ),
+    );
+  }
+
+  _renderVideo(user) {
+    return AspectRatio(
+        aspectRatio: 16 / 9,
+        child: "${user.uid}${user.username}" == widget.channelId
+            ? RtcLocalView.SurfaceView(
+                zOrderMediaOverlay: true,
+                zOrderOnTop: true,
+              )
+            : remoteUid.isNotEmpty
+                ? kIsWeb
+                    ? RtcRemoteView.SurfaceView(
+                        uid: remoteUid[0],
+                        channelId: widget.channelId,
+                      )
+                    : RtcRemoteView.TextureView(
+                        uid: remoteUid[0],
+                        channelId: widget.channelId,
+                      )
+                : Container());
   }
 }
