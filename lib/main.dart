@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:streamline/providers/user_provider.dart';
 import 'package:streamline/resources/auth_methods.dart';
@@ -14,7 +15,20 @@ import 'package:streamline/widgets/loading_indicator.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+          apiKey: "AIzaSyB6KAw-n9psFmlVz7wpf2-fFmDTbnLex18",
+          authDomain: "streamline-f2a12.firebaseapp.com",
+          projectId: "streamline-f2a12",
+          storageBucket: "streamline-f2a12.appspot.com",
+          messagingSenderId: "302533791208",
+          appId: "1:302533791208:web:d39e9c0c910d565826e85d"),
+    );
+  } else {
+    await Firebase.initializeApp();
+  }
+
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(
       create: (_) => UserProvider(),
