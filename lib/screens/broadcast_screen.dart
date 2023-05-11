@@ -56,7 +56,7 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
     _joinChannel();
   }
 
-  String baseUrl = "https://streamline-go-server-production.up.railway.app/";
+  String baseUrl = "https://streamline-go-server-production.up.railway.app";
 
   String? token;
 
@@ -110,7 +110,7 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
     if (defaultTargetPlatform == TargetPlatform.android) {
       await [Permission.microphone, Permission.camera].request();
     }
-    await _engine.joinChannelWithUserAccount(token, 'testing123',
+    await _engine.joinChannelWithUserAccount(token, 'widget.channelId',
         Provider.of<UserProvider>(context, listen: false).user.uid);
   }
 
