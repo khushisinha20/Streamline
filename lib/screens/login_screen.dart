@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:streamline/resources/auth_methods.dart';
+import 'package:streamline/responsive/responsive.dart';
 import 'package:streamline/screens/home_screen.dart';
 import 'package:streamline/widgets/custom_button.dart';
 import 'package:streamline/widgets/custom_textfield.dart';
@@ -56,39 +57,41 @@ class LoginScreenState extends State<LoginScreen> {
       ),
       body: _isLoading
           ? const LoadingIndicator()
-          : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 18.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: size.height * 0.1,
-                    ),
-                    const Text(
-                      'Email',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: CustomTextField(controller: _emailController),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    const Text(
-                      'Password',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: CustomTextField(controller: _passwordController),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    CustomButton(onTap: loginUser, text: 'Log In'),
-                  ],
+          : Responsive(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: size.height * 0.1,
+                      ),
+                      const Text(
+                        'Email',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: CustomTextField(controller: _emailController),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      const Text(
+                        'Password',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: CustomTextField(controller: _passwordController),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      CustomButton(onTap: loginUser, text: 'Log In'),
+                    ],
+                  ),
                 ),
               ),
             ),

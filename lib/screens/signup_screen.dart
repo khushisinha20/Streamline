@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:streamline/responsive/responsive.dart';
 import 'package:streamline/screens/home_screen.dart';
 import 'package:streamline/widgets/custom_button.dart';
 import 'package:streamline/widgets/custom_textfield.dart';
@@ -57,54 +58,58 @@ class SignupScreenState extends State<SignupScreen> {
       ),
       body: _isLoading
           ? LoadingIndicator()
-          : SingleChildScrollView(
-              child: Container(
-                height: MediaQuery.of(context).size.height,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 18.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        height: size.height * 0.1,
-                      ),
-                      const Text(
-                        'Email',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: CustomTextField(
-                          controller: _emailController,
+          : Responsive(
+              child: SingleChildScrollView(
+                child: Container(
+                  height: MediaQuery.of(context).size.height,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: size.height * 0.1,
                         ),
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      const Text(
-                        'Username',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: CustomTextField(controller: _usernameController),
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      const Text(
-                        'Password',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: CustomTextField(controller: _passwordController),
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      CustomButton(onTap: signUpUser, text: 'Sign Up'),
-                    ],
+                        const Text(
+                          'Email',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: CustomTextField(
+                            controller: _emailController,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        const Text(
+                          'Username',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child:
+                              CustomTextField(controller: _usernameController),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        const Text(
+                          'Password',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child:
+                              CustomTextField(controller: _passwordController),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        CustomButton(onTap: signUpUser, text: 'Sign Up'),
+                      ],
+                    ),
                   ),
                 ),
               ),

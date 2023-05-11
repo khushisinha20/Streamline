@@ -10,6 +10,7 @@ import 'package:streamline/providers/user_provider.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
 import 'package:streamline/resources/firestore_methods.dart';
+import 'package:streamline/responsive/responsive_layout.dart';
 import 'package:streamline/screens/home_screen.dart';
 import 'package:streamline/widgets/chat.dart';
 import 'package:http/http.dart' as http;
@@ -152,30 +153,56 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
       child: Scaffold(
         body: Padding(
           padding: EdgeInsets.all(8),
-          child: Column(
-            children: [
-              _renderVideo(user),
-              if ("${user.uid}${user.username}" == widget.channelId)
-                Column(
+          child: ResponsiveLayout(
+            desktopBody: Row(
+              children: [
+                Expanded(
+                    child: Column(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     InkWell(
                       onTap: _switchCamera,
-                      child: Text('Switch Camera'),
+                      child: const Text('Switch Camera'),
                     ),
                     InkWell(
                       onTap: onToggleMute,
                       child: Text(isMuted ? 'Unmute' : 'Mute'),
                     ),
+                    InkWell(
+                      onTap: onToggleMute,
+                      child: Text('Screenshare'),
+                    ),
                   ],
+                )),
+                Chat(channelId: widget.channelId),
+              ],
+            ),
+            mobileBody: Column(
+              children: [
+                _renderVideo(user),
+                if ("${user.uid}${user.username}" == widget.channelId)
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      InkWell(
+                        onTap: _switchCamera,
+                        child: Text('Switch Camera'),
+                      ),
+                      InkWell(
+                        onTap: onToggleMute,
+                        child: Text(isMuted ? 'Unmute' : 'Mute'),
+                      ),
+                    ],
+                  ),
+                Expanded(
+                  child: Chat(
+                    channelId: widget.channelId,
+                  ),
                 ),
-              Expanded(
-                child: Chat(
-                  channelId: widget.channelId,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
