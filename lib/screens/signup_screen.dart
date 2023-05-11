@@ -8,13 +8,13 @@ import 'package:streamline/widgets/loading_indicator.dart';
 
 class SignupScreen extends StatefulWidget {
   static const String routeName = '/signup';
-  const SignupScreen({super.key});
+  const SignupScreen({Key? key}) : super(key: key);
 
   @override
-  State<SignupScreen> createState() => SignupScreenState();
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class SignupScreenState extends State<SignupScreen> {
+class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
@@ -31,11 +31,9 @@ class SignupScreenState extends State<SignupScreen> {
       _usernameController.text,
       _passwordController.text,
     );
-
     setState(() {
       _isLoading = false;
     });
-
     if (res) {
       Navigator.pushReplacementNamed(context, HomeScreen.routeName);
     }
@@ -49,67 +47,73 @@ class SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
+  @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sign Up'),
+        title: const Text(
+          'Sign Up',
+        ),
       ),
       body: _isLoading
-          ? LoadingIndicator()
+          ? const LoadingIndicator()
           : Responsive(
               child: SingleChildScrollView(
-                child: Container(
-                  height: MediaQuery.of(context).size.height,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 18.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          height: size.height * 0.1,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: size.height * 0.1),
+                      const Text(
+                        'Email',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
                         ),
-                        const Text(
-                          'Email',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: CustomTextField(
+                          controller: _emailController,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: CustomTextField(
-                            controller: _emailController,
-                          ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      const Text(
+                        'Username',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
                         ),
-                        SizedBox(
-                          height: 20,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: CustomTextField(
+                          controller: _usernameController,
                         ),
-                        const Text(
-                          'Username',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      const Text(
+                        'Password',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child:
-                              CustomTextField(controller: _usernameController),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: CustomTextField(
+                          controller: _passwordController,
                         ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        const Text(
-                          'Password',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child:
-                              CustomTextField(controller: _passwordController),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        CustomButton(onTap: signUpUser, text: 'Sign Up'),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      CustomButton(onTap: signUpUser, text: 'Sign Up'),
+                    ],
                   ),
                 ),
               ),

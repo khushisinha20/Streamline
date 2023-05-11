@@ -74,6 +74,7 @@ class MyApp extends StatelessWidget {
               model.User.fromMap(value),
             );
           }
+          return value;
         }),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

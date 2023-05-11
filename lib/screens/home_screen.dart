@@ -7,13 +7,13 @@ import 'package:streamline/utils/colors.dart';
 
 class HomeScreen extends StatefulWidget {
   static String routeName = '/home';
-  const HomeScreen({super.key});
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  State<HomeScreen> createState() => HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> {
   int _page = 0;
   List<Widget> pages = [
     const FeedScreen(),
@@ -31,16 +31,14 @@ class HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context);
-
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: buttonColor,
         unselectedItemColor: primaryColor,
         backgroundColor: backgroundColor,
+        unselectedFontSize: 12,
         onTap: onPageChange,
         currentIndex: _page,
-        unselectedFontSize: 12,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(
