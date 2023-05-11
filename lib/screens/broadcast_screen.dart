@@ -1,5 +1,6 @@
 import 'dart:convert';
-
+import 'dart:math';
+import 'dart:io';
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ import 'package:streamline/responsive/responsive_layout.dart';
 import 'package:streamline/screens/home_screen.dart';
 import 'package:streamline/widgets/chat.dart';
 import 'package:http/http.dart' as http;
+import 'package:streamline/widgets/custom_button.dart';
 
 class BroadcastScreen extends StatefulWidget {
   final bool isBroadcaster;
@@ -33,6 +35,7 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
   List<int> remoteUid = [];
   bool switchCamera = true;
   bool isMuted = false;
+  bool isScreenSharing = false;
 
   @override
   void initState() {
@@ -42,7 +45,6 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
 
   void _initEngine() async {
     _engine = await RtcEngine.createWithContext(RtcEngineContext(appId));
-    await _engine.initialize(RtcEngineContext(appId));
     _addListeners();
 
     await _engine.enableVideo();
@@ -53,11 +55,10 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
     } else {
       _engine.setClientRole(ClientRole.Audience);
     }
-
     _joinChannel();
   }
 
-  String baseUrl = "https://streamline-go-server-production.up.railway.app";
+  String baseUrl = "https://twitch-tutorial-server.herokuapp.com";
 
   String? token;
 
@@ -96,7 +97,7 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
         remoteUid.removeWhere((element) => element == uid);
       });
     }, leaveChannel: (stats) {
-      debugPrint('Leave Channel $stats');
+      debugPrint('leaveChannel $stats');
       setState(() {
         remoteUid.clear();
       });
@@ -108,14 +109,19 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
 
   void _joinChannel() async {
     await getToken();
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      await [Permission.microphone, Permission.camera].request();
+    if (token != null) {
+      if (defaultTargetPlatform == TargetPlatform.android) {
+        await [Permission.microphone, Permission.camera].request();
+      }
+      await _engine.joinChannelWithUserAccount(
+        token,
+        widget.channelId,
+        Provider.of<UserProvider>(context, listen: false).user.uid,
+      );
     }
-    await _engine.joinChannelWithUserAccount(token, 'widget.channelId',
-        Provider.of<UserProvider>(context, listen: false).user.uid);
   }
 
-  void _switchCamera() async {
+  void _switchCamera() {
     _engine.switchCamera().then((value) {
       setState(() {
         switchCamera = !switchCamera;
@@ -132,6 +138,46 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
     await _engine.muteLocalAudioStream(isMuted);
   }
 
+  _startScreenShare() async {
+    final helper = await _engine.getScreenShareHelper(
+        appGroup: kIsWeb || Platform.isWindows ? null : 'io.agora');
+    await helper.disableAudio();
+    await helper.enableVideo();
+    await helper.setChannelProfile(ChannelProfile.LiveBroadcasting);
+    await helper.setClientRole(ClientRole.Broadcaster);
+    var windowId = 0;
+    var random = Random();
+    if (!kIsWeb &&
+        (Platform.isWindows || Platform.isMacOS || Platform.isAndroid)) {
+      final windows = _engine.enumerateWindows();
+      if (windows.isNotEmpty) {
+        final index = random.nextInt(windows.length - 1);
+        debugPrint('Screensharing window with index $index');
+        windowId = windows[index].id;
+      }
+    }
+    await helper.startScreenCaptureByWindowId(windowId);
+    setState(() {
+      isScreenSharing = true;
+    });
+    await helper.joinChannelWithUserAccount(
+      token,
+      widget.channelId,
+      Provider.of<UserProvider>(context, listen: false).user.uid,
+    );
+  }
+
+  _stopScreenShare() async {
+    final helper = await _engine.getScreenShareHelper();
+    await helper.destroy().then((value) {
+      setState(() {
+        isScreenSharing = false;
+      });
+    }).catchError((err) {
+      debugPrint('StopScreenShare $err');
+    });
+  }
+
   _leaveChannel() async {
     await _engine.leaveChannel();
     if ('${Provider.of<UserProvider>(context, listen: false).user.uid}${Provider.of<UserProvider>(context, listen: false).user.username}' ==
@@ -143,44 +189,68 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
     Navigator.pushReplacementNamed(context, HomeScreen.routeName);
   }
 
+  @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context).user;
+
     return WillPopScope(
       onWillPop: () async {
         await _leaveChannel();
         return Future.value(true);
       },
       child: Scaffold(
+        bottomNavigationBar: widget.isBroadcaster
+            ? Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                child: CustomButton(
+                  text: 'End Stream',
+                  onTap: _leaveChannel,
+                ),
+              )
+            : null,
         body: Padding(
-          padding: EdgeInsets.all(8),
+          padding: const EdgeInsets.all(8),
           child: ResponsiveLayout(
             desktopBody: Row(
               children: [
                 Expanded(
-                    child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    InkWell(
-                      onTap: _switchCamera,
-                      child: const Text('Switch Camera'),
-                    ),
-                    InkWell(
-                      onTap: onToggleMute,
-                      child: Text(isMuted ? 'Unmute' : 'Mute'),
-                    ),
-                    InkWell(
-                      onTap: onToggleMute,
-                      child: Text('Screenshare'),
-                    ),
-                  ],
-                )),
+                  child: Column(
+                    children: [
+                      _renderVideo(user, isScreenSharing),
+                      if ("${user.uid}${user.username}" == widget.channelId)
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            InkWell(
+                              onTap: _switchCamera,
+                              child: const Text('Switch Camera'),
+                            ),
+                            InkWell(
+                              onTap: onToggleMute,
+                              child: Text(isMuted ? 'Unmute' : 'Mute'),
+                            ),
+                            InkWell(
+                              onTap: isScreenSharing
+                                  ? _stopScreenShare
+                                  : _startScreenShare,
+                              child: Text(
+                                isScreenSharing
+                                    ? 'Stop ScreenSharing'
+                                    : 'Start Screensharing',
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
                 Chat(channelId: widget.channelId),
               ],
             ),
             mobileBody: Column(
               children: [
-                _renderVideo(user),
+                _renderVideo(user, isScreenSharing),
                 if ("${user.uid}${user.username}" == widget.channelId)
                   Column(
                     mainAxisSize: MainAxisSize.min,
@@ -188,7 +258,7 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
                     children: [
                       InkWell(
                         onTap: _switchCamera,
-                        child: Text('Switch Camera'),
+                        child: const Text('Switch Camera'),
                       ),
                       InkWell(
                         onTap: onToggleMute,
@@ -209,24 +279,33 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
     );
   }
 
-  _renderVideo(user) {
+  _renderVideo(user, isScreenSharing) {
     return AspectRatio(
-        aspectRatio: 16 / 9,
-        child: "${user.uid}${user.username}" == widget.channelId
-            ? RtcLocalView.SurfaceView(
-                zOrderMediaOverlay: true,
-                zOrderOnTop: true,
-              )
-            : remoteUid.isNotEmpty
-                ? kIsWeb
-                    ? RtcRemoteView.SurfaceView(
-                        uid: remoteUid[0],
-                        channelId: widget.channelId,
-                      )
-                    : RtcRemoteView.TextureView(
-                        uid: remoteUid[0],
-                        channelId: widget.channelId,
-                      )
-                : Container());
+      aspectRatio: 16 / 9,
+      child: "${user.uid}${user.username}" == widget.channelId
+          ? isScreenSharing
+              ? kIsWeb
+                  ? const RtcLocalView.SurfaceView.screenShare()
+                  : const RtcLocalView.TextureView.screenShare()
+              : const RtcLocalView.SurfaceView(
+                  zOrderMediaOverlay: true,
+                  zOrderOnTop: true,
+                )
+          : isScreenSharing
+              ? kIsWeb
+                  ? const RtcLocalView.SurfaceView.screenShare()
+                  : const RtcLocalView.TextureView.screenShare()
+              : remoteUid.isNotEmpty
+                  ? kIsWeb
+                      ? RtcRemoteView.SurfaceView(
+                          uid: remoteUid[0],
+                          channelId: widget.channelId,
+                        )
+                      : RtcRemoteView.TextureView(
+                          uid: remoteUid[0],
+                          channelId: widget.channelId,
+                        )
+                  : Container(),
+    );
   }
 }
